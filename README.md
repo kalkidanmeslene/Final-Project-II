@@ -1,36 +1,119 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Hibir Events
+
+A modern event management and ticketing platform built with Next.js 16, Prisma, Tailwind CSS, and internationalized routing.
+
+## Authors
+
+| Name | ID |
+| --- | --- |
+| Amar Kasim | UGR/7251/15 |
+| Bersabeh Degafu | UGR/2049/15 |
+| Eden Ephrem | UGR/6388/15 |
+| Kalkidan Meslene | UGR/6083/15 |
+
+## Features
+
+- Event discovery and booking flow
+- Organizer dashboard with event performance analytics
+- Admin reports, moderation, and transfers
+- Ticket QR generation and check-in support
+- Email notifications for registration, ticket updates, and password resets
+- Multilingual interface via `next-intl`
+- PostgreSQL-backed data model with Prisma migrations
 
 ## Getting Started
 
-First, run the development server:
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Copy environment variables
+
+```bash
+cp .env.example .env
+```
+
+Update `.env` with your database connection and mail provider settings.
+
+### 3. Run Prisma migrations
+
+```bash
+npm run db:migrate
+```
+
+### 4. Seed the database
+
+```bash
+npm run db:seed
+```
+
+### 5. Start the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Useful scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run dev` - start development server
+- `npm run build` - build production app
+- `npm run start` - start production server
+- `npm run lint` - run ESLint
+- `npm run db:migrate` - apply Prisma migrations
+- `npm run db:seed` - seed the database
+- `npm run db:studio` - open Prisma Studio
+- `npm run cron:notifications` - process scheduled email notifications
 
-## Learn More
+## Environment variables
 
-To learn more about Next.js, take a look at the following resources:
+Required variables are defined in `src/lib/env.ts` and supported by `.env.example`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Minimum required values:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `DATABASE_URL`
+- `AUTH_JWT_SECRET`
+- `AUTH_JWT_ISSUER`
+- `AUTH_JWT_AUDIENCE`
+- `APP_BASE_URL`
+- `EMAIL_ENABLED`
+- `EMAIL_PROVIDER`
+- `EMAIL_FROM`
 
-## Deploy on Vercel
+Optional email SMTP variables:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `SMTP_SECURE`
+- `SMTP_USER`
+- `SMTP_PASS`
+- `SMTP_FROM`
+- `RESEND_API_KEY`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Other recommended settings:
+
+- `CRON_SECRET`
+- `AUTH_ACCESS_TOKEN_TTL_SECONDS`
+- `AUTH_REFRESH_TOKEN_TTL_SECONDS`
+
+## Deployment
+
+This app is ready to deploy on Vercel or any Node-compatible host.
+
+For Vercel, use the `build` command and set environment variables in the deployment dashboard.
+
+For a custom server:
+
+```bash
+npm run build
+npm run start
+```
+
+## Notes
+
+- The project uses Prisma for database access and schema management.
+- The app includes support for organizer/admin roles, event management, and ticketing workflows.
+- Internationalized routes are available under `src/app/[locale]`.
