@@ -1,0 +1,86 @@
+{
+  "metadata": {
+    "title": "Hibir Events — Discover events in Ethiopia",
+    "description": "Browse, search, and book tickets for events in Ethiopia with secure QR verification."
+  },
+  "common": {
+    "appName": "Hibir Events",
+    "loading": "Loading…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "search": "Search",
+    "retry": "Retry",
+    "apply": "Apply",
+    "dismiss": "Dismiss"
+  },
+  "nav": {
+    "home": "Home",
+    "search": "Search",
+    "tickets": "Tickets",
+    "searchPlaceholder": "Search events…",
+    "login": "Login",
+    "signUp": "Sign Up",
+    "dashboard": "Dashboard",
+    "events": "Events",
+    "profile": "Profile",
+    "notifications": "Notifications"
+  },
+  "language": {
+    "label": "Language",
+    "english": "English",
+    "amharic": "Amharic"
+  },
+  "calendar": {
+    "label": "Calendar",
+    "gregorian": "Gregorian",
+    "ethiopian": "Ethiopian",
+    "ecSuffix": "E.C.",
+    "gcSuffix": "G.C."
+  },
+  "auth": {
+    "emailOrPhone": "Email or phone",
+    "emailOrPhonePlaceholder": "Enter email or phone",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "signIn": "Sign in",
+    "signingIn": "Signing in…",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up",
+    "fullName": "Full Name",
+    "email": "Email",
+    "phone": "Phone Number",
+    "createPassword": "Create a strong password",
+    "confirmPassword": "Confirm password",
+    "confirmPasswordPlaceholder": "Re-enter your password",
+    "createAccount": "Create account",
+    "hasAccount": "Already have an account?",
+    "organizerPrompt": "Want to host events?",
+    "organizerLink": "Create an organizer account",
+    "orContinueWith": "Or continue with"
+  },
+  "landing": {
+    "heroTitle": "Discover events across Ethiopia",
+    "heroSubtitle": "Find concerts, conferences, sports, and community gatherings — book tickets in seconds.",
+    "browseEvents": "Browse events",
+    "featured": "Featured events",
+    "trending": "Trending now"
+  },
+  "events": {
+    "title": "Events",
+    "noResults": "No events found.",
+    "free": "Free",
+    "soldOut": "Sold out",
+    "ticketsLeft": "{count} tickets left",
+    "bookNow": "Book now",
+    "bookTicket": "Book ticket",
+    "rsvp": "RSVP",
+    "viewDetails": "View details"
+  },
+  "profile": {
+    "preferredLanguage": "Preferred language",
+    "languageHint": "Used for the site and emails when available."
+  }
+}

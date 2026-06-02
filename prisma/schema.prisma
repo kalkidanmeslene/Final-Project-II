@@ -1,0 +1,695 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  attendee
+  organizer
+  admin
+}
+
+enum AccountStatus {
+  active
+  pending
+  suspended
+}
+
+enum OrganizerVerificationStatus {
+  pending
+  approved
+  rejected
+}
+
+enum AuditAction {
+  register
+  organizer_request
+  organizer_approved
+  organizer_rejected
+  login_success
+  login_failed
+  logout
+  forgot_password
+  reset_password
+  suspend_account
+  unsuspend_account
+  profile_updated
+  password_changed
+  profile_picture_uploaded
+  ticket_transferred
+  event_approved
+  event_rejected
+  category_created
+  category_updated
+  category_deleted
+  location_created
+  location_updated
+  location_deleted
+  settings_updated
+}
+
+model User {
+  id                String        @id @default(uuid())
+  fullName          String
+  email             String?       @unique
+  phoneNumber       String?       @unique
+  preferredLanguage String
+  profilePictureUrl String?
+  bio               String?
+
+  passwordHash String
+
+  role   UserRole      @default(attendee)
+  status AccountStatus @default(active)
+
+  suspendedAt DateTime?
+  suspendedBy String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  organizerVerification OrganizerVerification?
+  sessions              Session[]
+  passwordResetTokens   PasswordResetToken[]
+  auditLogs             AuditLog[]
+  organizedEvents       Event[]       @relation("EventOrganizer")
+  reviewedEvents        Event[]       @relation("EventReviewer")
+  bookings              Booking[]
+  tickets               Ticket[]
+  ticketsCheckedIn      Ticket[]       @relation("TicketCheckedInBy")
+  eventStaffAssignments EventStaff[]
+  ticketScans           TicketScan[]
+  transfersSent         TicketTransfer[] @relation("TransferFrom")
+  transfersReceived     TicketTransfer[] @relation("TransferTo")
+  notifications         Notification[]
+  notificationPreferences NotificationPreference?
+  scheduledNotifications ScheduledNotification[]
+  eventReviews          EventReview[]
+  moderatedReviews      EventReview[] @relation("ReviewModerator")
+  aiJobs                AiJob[]
+
+  @@index([email])
+  @@index([phoneNumber])
+  @@index([role])
+  @@index([status])
+}
+
+model OrganizerVerification {
+  id String @id @default(uuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  organizationName String
+  organizationWebsite String?
+  organizationAddress String?
+  organizationPhone String?
+
+  verificationDocsUrls String[]
+
+  status   OrganizerVerificationStatus @default(pending)
+  reviewedAt DateTime?
+  reviewedBy String?
+  reviewNote String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
+
+model Session {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  refreshTokenHash String
+  userAgent        String?
+  ipAddress        String?
+
+  revokedAt  DateTime?
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([revokedAt])
+}
+
+model PasswordResetToken {
+  id String @id @default(uuid())
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tokenHash String
+  expiresAt DateTime
+  usedAt    DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@index([expiresAt])
+}
+
+model AuditLog {
+  id String @id @default(uuid())
+
+  userId String?
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  action AuditAction
+  success Boolean @default(true)
+
+  ipAddress String?
+  userAgent String?
+  metadata  Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([action])
+  @@index([createdAt])
+  @@index([userId])
+}
+
+enum EventStatus {
+  draft
+  pending
+  approved
+  cancelled
+  completed
+}
+
+enum EventVisibility {
+  public
+  private
+  unlisted
+}
+
+enum EventMediaType {
+  image
+  video
+}
+
+enum TicketStatus {
+  pending
+  confirmed
+  cancelled
+  void
+}
+
+enum ScanResult {
+  valid
+  already_used
+  expired
+  invalid
+}
+
+enum EventStaffRole {
+  scanner
+  manager
+}
+
+enum NotificationType {
+  event_submitted
+  event_approved
+  event_rejected
+  event_updated
+  event_postponed
+  event_cancelled
+  event_completed
+  event_reminder
+  booking_confirmed
+  booking_failed
+  ticket_transferred
+  ticket_received
+  organizer_announcement
+}
+
+enum EmailDeliveryStatus {
+  pending
+  sent
+  failed
+  skipped
+}
+
+enum BookingStatus {
+  pending
+  confirmed
+  cancelled
+}
+
+enum PaymentStatus {
+  pending
+  successful
+  failed
+}
+
+model EventCategory {
+  id          String @id @default(uuid())
+  name        String @unique
+  slug        String @unique
+  description String?
+
+  events Event[]
+
+  createdAt DateTime @default(now())
+}
+
+model Event {
+  id          String @id @default(uuid())
+  organizerId String
+  organizer   User   @relation("EventOrganizer", fields: [organizerId], references: [id], onDelete: Cascade)
+
+  title       String
+  slug        String @unique
+  description String
+
+  categoryId String
+  category   EventCategory @relation(fields: [categoryId], references: [id])
+
+  location String
+  venue    String
+
+  startsAt DateTime
+  endsAt   DateTime
+
+  ticketPrice Decimal @db.Decimal(10, 2)
+  capacity    Int
+
+  bannerUrl String?
+
+  status     EventStatus     @default(pending)
+  visibility EventVisibility @default(public)
+
+  postponedAt      DateTime?
+  postponeReason   String?
+  originalStartsAt DateTime?
+
+  reviewedAt DateTime?
+  reviewedBy String?
+  reviewer   User?   @relation("EventReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull)
+  reviewNote String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  media         EventMedia[]
+  ticketTypes   TicketType[]
+  bookings      Booking[]
+  tickets       Ticket[]
+  staff         EventStaff[]
+  ticketScans   TicketScan[]
+  ticketTransfers TicketTransfer[]
+  notifications Notification[]
+  scheduledNotifications ScheduledNotification[]
+  reviews         EventReview[]
+
+  averageRating Decimal? @db.Decimal(3, 2)
+  reviewCount   Int      @default(0)
+
+  transferEnabled Boolean @default(true)
+  isFeatured      Boolean @default(false)
+  ticketsSold     Int     @default(0)
+
+  @@index([organizerId])
+  @@index([status])
+  @@index([visibility])
+  @@index([startsAt])
+  @@index([endsAt])
+  @@index([categoryId])
+  @@index([slug])
+  @@index([status, visibility, startsAt])
+  @@index([status, visibility, isFeatured, startsAt])
+  @@index([status, visibility, ticketsSold])
+  @@index([ticketPrice])
+}
+
+model EventMedia {
+  id      String @id @default(uuid())
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  url       String
+  mediaType EventMediaType @default(image)
+  sortOrder Int            @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([eventId])
+}
+
+model TicketType {
+  id      String @id @default(uuid())
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  name        String
+  description String?
+  price       Decimal @db.Decimal(10, 2)
+  capacity    Int
+  soldCount   Int     @default(0)
+  sortOrder   Int     @default(0)
+  isActive    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookingLines BookingLine[]
+  tickets      Ticket[]
+
+  @@index([eventId])
+  @@index([eventId, isActive])
+}
+
+model Booking {
+  id      String @id @default(uuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  status      BookingStatus @default(pending)
+  totalAmount Decimal       @db.Decimal(10, 2)
+  currency    String        @default("ETB")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lines    BookingLine[]
+  payment  Payment?
+  tickets  Ticket[]
+
+  @@index([userId])
+  @@index([eventId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model BookingLine {
+  id           String @id @default(uuid())
+  bookingId    String
+  booking      Booking    @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  ticketTypeId String
+  ticketType   TicketType @relation(fields: [ticketTypeId], references: [id], onDelete: Restrict)
+
+  quantity  Int
+  unitPrice Decimal @db.Decimal(10, 2)
+  lineTotal Decimal @db.Decimal(10, 2)
+
+  @@index([bookingId])
+  @@index([ticketTypeId])
+}
+
+model Payment {
+  id        String @id @default(uuid())
+  bookingId String @unique
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  status        PaymentStatus @default(pending)
+  amount        Decimal       @db.Decimal(10, 2)
+  referenceCode String        @unique
+  failureReason String?
+  processedAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([referenceCode])
+}
+
+model EventStaff {
+  id      String @id @default(uuid())
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  role      EventStaffRole @default(scanner)
+  addedById String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([eventId, userId])
+  @@index([userId])
+}
+
+model Ticket {
+  id           String @id @default(uuid())
+  ticketCode   String @unique
+  eventId      String
+  event        Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookingId    String
+  booking      Booking    @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  ticketTypeId String
+  ticketType   TicketType @relation(fields: [ticketTypeId], references: [id], onDelete: Restrict)
+
+  status TicketStatus @default(confirmed)
+
+  qrVersion   Int       @default(1)
+  checkedInAt DateTime?
+  checkedInById String?
+  checkedInBy   User?   @relation("TicketCheckedInBy", fields: [checkedInById], references: [id], onDelete: SetNull)
+
+  scans TicketScan[]
+  transfers TicketTransfer[]
+  review    EventReview?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([eventId])
+  @@index([userId])
+  @@index([bookingId])
+  @@index([ticketCode])
+  @@index([eventId, status])
+  @@index([eventId, checkedInAt])
+  @@index([eventId, userId])
+}
+
+model TicketTransfer {
+  id       String @id @default(uuid())
+  ticketId String
+  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  eventId  String
+  event    Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  fromUserId String
+  fromUser   User @relation("TransferFrom", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUserId   String
+  toUser     User @relation("TransferTo", fields: [toUserId], references: [id], onDelete: Cascade)
+
+  ticketCodeSnapshot String
+  qrVersionBefore    Int
+  qrVersionAfter     Int
+
+  createdAt DateTime @default(now())
+
+  @@index([ticketId])
+  @@index([eventId])
+  @@index([fromUserId])
+  @@index([toUserId])
+  @@index([createdAt])
+}
+
+model TicketScan {
+  id      String @id @default(uuid())
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  ticketId String?
+  ticket   Ticket? @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+
+  scannedById String
+  scannedBy   User   @relation(fields: [scannedById], references: [id], onDelete: Cascade)
+
+  result      ScanResult
+  ticketCode  String?
+  detail      String?
+  ipAddress   String?
+  userAgent   String?
+
+  createdAt DateTime @default(now())
+
+  @@index([eventId])
+  @@index([ticketId])
+  @@index([scannedById])
+  @@index([createdAt])
+  @@index([eventId, result])
+}
+
+model Notification {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type    NotificationType
+  title   String
+  body    String
+  readAt  DateTime?
+  metadata Json?
+
+  emailStatus EmailDeliveryStatus?
+  emailSentAt DateTime?
+
+  eventId String?
+  event   Event? @relation(fields: [eventId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([userId, readAt])
+  @@index([createdAt])
+}
+
+model NotificationPreference {
+  userId String @id
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  inAppEnabled Boolean @default(true)
+  emailEnabled Boolean @default(true)
+
+  bookingEmail      Boolean @default(true)
+  reminderEmail     Boolean @default(true)
+  eventUpdateEmail  Boolean @default(true)
+  cancellationEmail Boolean @default(true)
+  transferEmail     Boolean @default(true)
+  announcementEmail Boolean @default(true)
+
+  reminderHoursBefore Json @default("[24, 2]")
+
+  updatedAt DateTime @updatedAt
+}
+
+model ScheduledNotification {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  type         NotificationType @default(event_reminder)
+  scheduledFor DateTime
+  processedAt  DateTime?
+  cancelledAt  DateTime?
+  metadata     Json?
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, eventId, type, scheduledFor])
+  @@index([scheduledFor, processedAt, cancelledAt])
+  @@index([eventId])
+  @@index([userId])
+}
+
+enum ReviewStatus {
+  pending
+  approved
+  rejected
+  flagged
+}
+
+model EventReview {
+  id       String @id @default(uuid())
+  eventId  String
+  event    Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ticketId String @unique
+  ticket   Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  rating  Int
+  comment String
+
+  status         ReviewStatus @default(pending)
+  moderatedById  String?
+  moderator      User?        @relation("ReviewModerator", fields: [moderatedById], references: [id], onDelete: SetNull)
+  moderatedAt    DateTime?
+  moderationNote String?
+
+  ipAddress String?
+  userAgent String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, eventId])
+  @@index([eventId, status])
+  @@index([eventId, createdAt])
+  @@index([status, createdAt])
+  @@index([userId])
+}
+
+model EventLocation {
+  id       String  @id @default(uuid())
+  name     String
+  city     String
+  region   String?
+  country  String  @default("Ethiopia")
+  isActive Boolean @default(true)
+  sortOrder Int    @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, city])
+  @@index([isActive, sortOrder])
+}
+
+model SystemSetting {
+  key         String @id
+  value       Json
+  description String?
+
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+
+  @@index([updatedAt])
+}
+
+enum AiJobType {
+  category_suggestion
+  translation
+}
+
+enum AiJobStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
+model AiJob {
+  id           String      @id @default(uuid())
+  type         AiJobType
+  status       AiJobStatus @default(pending)
+  input        Json
+  result       Json?
+  errorCode    String?
+  errorMessage String?
+  provider     String?
+  userId       String?
+  user         User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  completedAt  DateTime?
+
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}

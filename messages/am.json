@@ -1,0 +1,86 @@
+{
+  "metadata": {
+    "title": "ሕብር ክስተቶች — በኢትዮጵያ ውስጥ ክስተቶችን ያግኙ",
+    "description": "በኢትዮጵያ ውስጥ ክስተቶችን ይፈልጉ፣ ይዘዙ እና በደህንነት QR ማረጋገጫ ይጠቀሙ።"
+  },
+  "common": {
+    "appName": "ሕብር ክስተቶች",
+    "loading": "በመጫን ላይ…",
+    "save": "አስቀምጥ",
+    "cancel": "ሰርዝ",
+    "search": "ፈልግ",
+    "retry": "እንደገና ሞክር",
+    "apply": "ተግብር",
+    "dismiss": "ዝጋ"
+  },
+  "nav": {
+    "home": "መነሻ",
+    "search": "ፍለጋ",
+    "tickets": "ትኬቶች",
+    "searchPlaceholder": "ክስተቶችን ፈልግ…",
+    "login": "ግባ",
+    "signUp": "ተመዝገብ",
+    "dashboard": "ዳሽቦርድ",
+    "events": "ክስተቶች",
+    "profile": "መገለጫ",
+    "notifications": "ማሳወቂያዎች"
+  },
+  "language": {
+    "label": "ቋንቋ",
+    "english": "English",
+    "amharic": "አማርኛ"
+  },
+  "calendar": {
+    "label": "ቀን መቁጠሪያ",
+    "gregorian": "ግሪጎሪያን",
+    "ethiopian": "ኢትዮጵያዊ",
+    "ecSuffix": "ዓ.ም.",
+    "gcSuffix": "ዓ.ም. ግሪጎሪያን"
+  },
+  "auth": {
+    "emailOrPhone": "ኢሜይል ወይም ስልክ",
+    "emailOrPhonePlaceholder": "ኢሜይል ወይም ስልክ ያስገቡ",
+    "emailPlaceholder": "you@example.com",
+    "password": "የይለፍ ቃል",
+    "passwordPlaceholder": "የይለፍ ቃልዎን ያስገቡ",
+    "rememberMe": "አስታውሰኝ",
+    "forgotPassword": "የይለፍ ቃል ረሱ?",
+    "signIn": "ግባ",
+    "signingIn": "በመግባት ላይ…",
+    "noAccount": "መለያ የለዎትም?",
+    "signUp": "ተመዝገብ",
+    "fullName": "ሙሉ ስም",
+    "email": "ኢሜይል",
+    "phone": "ስልክ ቁጥር",
+    "createPassword": "ጠንካራ የይለፍ ቃል ይፍጠሩ",
+    "confirmPassword": "የይለፍ ቃል ያረጋግጡ",
+    "confirmPasswordPlaceholder": "የይለፍ ቃልዎን እንደገና ያስገቡ",
+    "createAccount": "መለያ ፍጠር",
+    "hasAccount": "መለያ አለዎት?",
+    "organizerPrompt": "ክስተቶችን ማስተናገድ ይፈልጋሉ?",
+    "organizerLink": "የአዘጋጅ መለያ ይፍጠሩ",
+    "orContinueWith": "ወይም ይቀጥሉ በ"
+  },
+  "landing": {
+    "heroTitle": "በኢትዮጵያ ውስጥ ክስተቶችን ያግኙ",
+    "heroSubtitle": "ኮንሰርቶች፣ ኮንፈረንሶች፣ ስፖርት እና የማህበረሰብ ዝግጅቶች — ትኬት በፍጥነት ይዘዙ።",
+    "browseEvents": "ክስተቶችን ይመልከቱ",
+    "featured": "ተመራጭ ክስተቶች",
+    "trending": "አሁን ታዋቂ"
+  },
+  "events": {
+    "title": "ክስተቶች",
+    "noResults": "ክስተት አልተገኘም።",
+    "free": "ነጻ",
+    "soldOut": "ተሸጠ",
+    "ticketsLeft": "{count} ትኬቶች ቀርተዋል",
+    "bookNow": "አሁን ይዘዙ",
+    "bookTicket": "ትኬት ይዘዙ",
+    "rsvp": "RSVP",
+    "viewDetails": "ዝርዝር ይመልከቱ"
+  },
+  "profile": {
+    "preferredLanguage": "የተመረጠ ቋንቋ",
+    "languageHint": "ለድረ-ገጹ እና ለኢሜይሎች (ሲገኝ) ይጠቅማል።"
+  }
+}
